@@ -51,9 +51,9 @@ document.addEventListener('DOMContentLoaded', () => {
   function updateSubmissionUI() {
     const method = orderForm.submitMethod.value;
     if (method === 'formspree') {
-      formspreeBlock.classList.remove('hidden');
+      if (formspreeBlock) formspreeBlock.classList.add('hidden'); // Hide manual input since URL is built-in
     } else {
-      formspreeBlock.classList.add('hidden');
+      if (formspreeBlock) formspreeBlock.classList.add('hidden');
     }
   }
 
@@ -86,7 +86,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const budget = orderForm.budget.value.trim();
     const deadline = orderForm.deadline.value;
     const method = orderForm.submitMethod.value;
-    const formspreeEndpoint = orderForm.formspreeEndpoint.value.trim();
+
+    // Your hardcoded Formspree endpoint
+    const formspreeEndpoint = "https://formspree.io/f/xnpjrnpk";
 
     let hasError = false;
     if (!name) { document.getElementById('errName').classList.remove('hidden'); hasError = true; }
@@ -109,7 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    // Build order summary
+    // Build order summary for mailto
     const summaryLines = [
       `Client Name: ${name}`,
       `Email: ${email}`,
@@ -139,13 +141,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // method === 'formspree'
-    if (!formspreeEndpoint) {
-      formStatus.innerHTML = 'No Formspree endpoint provided. Please add your Formspree URL or switch to mailto.';
-      submitBtn.disabled = false;
-      submitBtn.classList.remove('opacity-70');
-      return;
-    }
-
     formStatus.textContent = 'Sending...';
     try {
       const payload = { clientName: name, email, service, budget, deadline, description };
@@ -165,7 +160,7 @@ document.addEventListener('DOMContentLoaded', () => {
       updateSubmissionUI();
     } catch (err) {
       console.error(err);
-      formStatus.innerHTML = 'Error sending order. Please use the mailto option instead.';
+      formStatus.innerHTML = 'Error sending order. Please try again or use the mailto option.';
     } finally {
       submitBtn.disabled = false;
       submitBtn.classList.remove('opacity-70');
