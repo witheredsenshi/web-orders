@@ -87,7 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const deadline = orderForm.deadline.value;
     const method = orderForm.submitMethod.value;
 
-    // Your hardcoded Formspree endpoint
+    // Hardcoded Formspree endpoint
     const formspreeEndpoint = "https://formspree.io/f/xnpjrnpk";
 
     let hasError = false;
@@ -127,13 +127,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (method === 'mailto') {
       const subject = encodeURIComponent(`WebCraft Studio Order — ${service} — ${name}`);
       const body = encodeURIComponent(summary);
-      const mailto = `mailto:hello@webcraft.example?subject=${subject}&body=${body}`;
+      const mailto = `mailto:witheredsenshi999@gmail.com?subject=${subject}&body=${body}`;
       
       formStatus.textContent = 'Opening your email client...';
       window.location.href = mailto;
       
       setTimeout(() => {
-        formStatus.textContent = 'Email client opened! If it didn’t open, email hello@webcraft.example directly.';
+        formStatus.textContent = 'Email client opened! If it didn’t open, email witheredsenshi999@gmail.com directly.';
         submitBtn.disabled = false;
         submitBtn.classList.remove('opacity-70');
       }, 500);
