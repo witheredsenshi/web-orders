@@ -53,24 +53,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Order form logic
   const orderForm = document.getElementById('orderForm');
-  const formspreeBlock = document.getElementById('formspreeBlock');
   const formStatus = document.getElementById('formStatus');
   const submitBtn = document.getElementById('submitBtn');
 
   if (!orderForm) return;
-
-  function updateSubmissionUI() {
-    const method = orderForm.submitMethod.value;
-    if (method === 'formspree') {
-      if (formspreeBlock) formspreeBlock.classList.add('hidden'); // Hide manual input since URL is built-in
-    } else {
-      if (formspreeBlock) formspreeBlock.classList.add('hidden');
-    }
-  }
-
-  orderForm.addEventListener('change', (e) => {
-    if (e.target.name === 'submitMethod') updateSubmissionUI();
-  });
 
   function isValidEmail(email) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -96,9 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const description = orderForm.description.value.trim();
     const budget = orderForm.budget.value.trim();
     const deadline = orderForm.deadline.value;
-    const method = orderForm.submitMethod.value;
 
-    // Hardcoded Formspree endpoint
     const formspreeEndpoint = "https://formspree.io/f/xnpjrnpk";
 
     let hasError = false;
@@ -126,36 +110,6 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    // Build order summary for mailto
-    const summaryLines = [
-      `Client Name: ${name}`,
-      `Email: ${email}`,
-      `Service: ${service}`,
-      `Budget: ${budget || 'Not specified'}`,
-      `Deadline: ${deadline || 'Not specified'}`,
-      '',
-      'Project Description:',
-      description
-    ];
-    const summary = summaryLines.join('\n');
-
-    if (method === 'mailto') {
-      const subject = encodeURIComponent(`WebCraft Studio Order — ${service} — ${name}`);
-      const body = encodeURIComponent(summary);
-      const mailto = `mailto:witheredsenshi999@gmail.com?subject=${subject}&body=${body}`;
-      
-      formStatus.textContent = 'Opening your email client...';
-      window.location.href = mailto;
-      
-      setTimeout(() => {
-        formStatus.textContent = 'Email client opened! If it didn’t open, email witheredsenshi999@gmail.com directly.';
-        submitBtn.disabled = false;
-        submitBtn.classList.remove('opacity-70');
-      }, 500);
-      return;
-    }
-
-    // method === 'formspree'
     formStatus.textContent = 'Sending...';
     try {
       const payload = { clientName: name, email, service, budget, deadline, description };
@@ -172,10 +126,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
       formStatus.textContent = 'Order submitted successfully — thank you!';
       orderForm.reset();
-      updateSubmissionUI();
     } catch (err) {
       console.error(err);
-      formStatus.innerHTML = 'Error sending order. Please try again or use the mailto option.';
+      formStatus.innerHTML = 'Error sending order. Please try again later or email us directly.';
     } finally {
       submitBtn.disabled = false;
       submitBtn.classList.remove('opacity-70');
@@ -192,6 +145,4 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   });
-
-  updateSubmissionUI();
 });
