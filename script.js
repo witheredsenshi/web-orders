@@ -40,6 +40,17 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // Set Minimum Deadline Date to 7 days from today
+  const deadlineInput = document.getElementById('deadline');
+  if (deadlineInput) {
+    const minDate = new Date();
+    minDate.setDate(minDate.getDate() + 7);
+    const yyyy = minDate.getFullYear();
+    const mm = String(minDate.getMonth() + 1).padStart(2, '0');
+    const dd = String(minDate.getDate()).padStart(2, '0');
+    deadlineInput.min = `${yyyy}-${mm}-${dd}`;
+  }
+
   // Order form logic
   const orderForm = document.getElementById('orderForm');
   const formspreeBlock = document.getElementById('formspreeBlock');
@@ -95,12 +106,16 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!isValidEmail(email)) { document.getElementById('errEmail').classList.remove('hidden'); hasError = true; }
     if (!service) { document.getElementById('errService').classList.remove('hidden'); hasError = true; }
     if (!description) { document.getElementById('errDesc').classList.remove('hidden'); hasError = true; }
+    
     if (deadline) {
-      const d = new Date(deadline);
-      const now = new Date();
-      now.setHours(0,0,0,0);
-      if (isNaN(d.getTime()) || d < now) {
-        document.getElementById('errDeadline').classList.remove('hidden'); hasError = true;
+      const selectedDate = new Date(deadline);
+      const minAllowedDate = new Date();
+      minAllowedDate.setHours(0,0,0,0);
+      minAllowedDate.setDate(minAllowedDate.getDate() + 7);
+
+      if (isNaN(selectedDate.getTime()) || selectedDate < minAllowedDate) {
+        document.getElementById('errDeadline').classList.remove('hidden'); 
+        hasError = true;
       }
     }
 
