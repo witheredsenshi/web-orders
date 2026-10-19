@@ -111,21 +111,42 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Email & Password Login Submit
+  // Secure Email & Password Login/Registration Check
   if (emailLoginForm) {
     emailLoginForm.addEventListener('submit', (e) => {
       e.preventDefault();
-      const emailVal = loginEmailInput.value.trim();
+      const emailVal = loginEmailInput.value.trim().toLowerCase();
       const passwordVal = loginPasswordInput.value.trim();
 
-      if (emailVal && emailVal.includes('@') && passwordVal.length >= 6) {
+      if (!emailVal || !emailVal.includes('@') || passwordVal.length < 6) {
+        alert('Please enter a valid email and a password of at least 6 characters.');
+        return;
+      }
+
+      // Fetch registered accounts database from localStorage
+      const registeredAccounts = JSON.parse(localStorage.getItem('wc_registered_accounts') || '{}');
+
+      if (registeredAccounts[emailVal]) {
+        // Account exists: Verify password
+        if (registeredAccounts[emailVal] === passwordVal) {
+          localStorage.setItem('wc_user_email', emailVal);
+          if (loginModal) loginModal.classList.add('hidden');
+          loginEmailInput.value = '';
+          loginPasswordInput.value = '';
+          checkAuthState();
+        } else {
+          alert('Incorrect password for this email address. Please try again.');
+        }
+      } else {
+        // New account: Register and save password
+        registeredAccounts[emailVal] = passwordVal;
+        localStorage.setItem('wc_registered_accounts', JSON.stringify(registeredAccounts));
         localStorage.setItem('wc_user_email', emailVal);
+        
         if (loginModal) loginModal.classList.add('hidden');
         loginEmailInput.value = '';
         loginPasswordInput.value = '';
         checkAuthState();
-      } else {
-        alert('Please enter a valid email and a password of at least 6 characters.');
       }
     });
   }
@@ -241,12 +262,12 @@ document.addEventListener('DOMContentLoaded', () => {
         deadline,
         date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
       };
-      allOrders[email].unshift(newOrderRecord); // Add to beginning of array
+      allOrders[email].unshift(newOrderRecord);
       localStorage.setItem('wc_user_orders', JSON.stringify(allOrders));
 
       formStatus.textContent = 'Order submitted successfully & saved to your dashboard!';
       orderForm.reset();
-      checkAuthState(); // re-fill email & refresh dashboard list
+      checkAuthState();
     } catch (err) {
       console.error(err);
       formStatus.innerHTML = 'Error sending order. Please try again later or email us directly.';
