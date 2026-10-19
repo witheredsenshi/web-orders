@@ -115,6 +115,27 @@
       </div>
     </section>
 
+    <!-- Client Dashboard / Order History Section (Visible when logged in) -->
+    <section id="dashboardSection" class="max-w-6xl mx-auto px-6 py-8 border-t border-gray-800 hidden">
+      <div class="bg-gray-800/60 rounded-2xl p-6 border border-gray-700 shadow-sm">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-2">
+          <div>
+            <h2 class="text-xl font-semibold">Client Dashboard</h2>
+            <p class="text-sm text-gray-400">Manage and view your submitted project orders with WebCraft Studio.</p>
+          </div>
+          <span class="px-3 py-1 bg-indigo-900/50 text-indigo-300 text-xs font-semibold rounded-full border border-indigo-700/50 w-fit">Active Session</span>
+        </div>
+
+        <div id="noOrdersMessage" class="text-sm text-gray-400 py-4 italic">
+          You haven't submitted any orders yet. Fill out the order form below to start your first project!
+        </div>
+
+        <div id="ordersListContainer" class="grid gap-4 mt-4 hidden">
+          <!-- Dynamically populated past orders will appear here -->
+        </div>
+      </div>
+    </section>
+
     <!-- Portfolio / Recent Work -->
     <section id="portfolio" class="max-w-6xl mx-auto px-6 py-12 border-t border-gray-800">
       <div class="flex flex-col md:flex-row md:items-end justify-between mb-8">
