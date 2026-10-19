@@ -22,6 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const closeModalBtn = document.getElementById('closeModalBtn');
   const emailLoginForm = document.getElementById('emailLoginForm');
   const loginEmailInput = document.getElementById('loginEmailInput');
+  const loginPasswordInput = document.getElementById('loginPasswordInput');
   const googleLoginBtn = document.getElementById('googleLoginBtn');
   
   const userProfilePill = document.getElementById('userProfilePill');
@@ -69,16 +70,21 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Email Login Submit
+  // Email & Password Login Submit
   if (emailLoginForm) {
     emailLoginForm.addEventListener('submit', (e) => {
       e.preventDefault();
       const emailVal = loginEmailInput.value.trim();
-      if (emailVal && emailVal.includes('@')) {
+      const passwordVal = loginPasswordInput.value.trim();
+
+      if (emailVal && emailVal.includes('@') && passwordVal.length >= 6) {
         localStorage.setItem('wc_user_email', emailVal);
         if (loginModal) loginModal.classList.add('hidden');
         loginEmailInput.value = '';
+        loginPasswordInput.value = '';
         checkAuthState();
+      } else {
+        alert('Please enter a valid email and a password of at least 6 characters.');
       }
     });
   }
