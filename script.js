@@ -23,10 +23,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Initialize theme
-  const stored = localStorage.getItem('wc-theme');
-  if (stored) {
-    applyTheme(stored);
+  const storedTheme = localStorage.getItem('wc-theme');
+  if (storedTheme) {
+    applyTheme(storedTheme);
   } else {
     const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
     applyTheme(prefersDark ? 'dark' : 'light');
@@ -51,7 +50,95 @@ document.addEventListener('DOMContentLoaded', () => {
     deadlineInput.min = `${yyyy}-${mm}-${dd}`;
   }
 
-  // Order form logic
+  // --- Authentication & Session State Logic ---
+  const loginModal = document.getElementById('loginModal');
+  const authModalBtn = document.getElementById('authModalBtn');
+  const closeModalBtn = document.getElementById('closeModalBtn');
+  const emailLoginForm = document.getElementById('emailLoginForm');
+  const loginEmailInput = document.getElementById('loginEmailInput');
+  const googleLoginBtn = document.getElementById('googleLoginBtn');
+  
+  const userProfilePill = document.getElementById('userProfilePill');
+  const userEmailDisplay = document.getElementById('userEmailDisplay');
+  const logoutBtn = document.getElementById('logoutBtn');
+  const formAuthGate = document.getElementById('formAuthGate');
+  const triggerLoginModal = document.getElementById('triggerLoginModal');
+  const emailField = document.getElementById('email');
+
+  function checkAuthState() {
+    const savedUser = localStorage.getItem('wc_user_email');
+    if (savedUser) {
+      if (userProfilePill) userProfilePill.classList.remove('hidden');
+      if (userProfilePill) userProfilePill.classList.add('flex');
+      if (userEmailDisplay) userEmailDisplay.textContent = savedUser;
+      if (emailField) emailField.value = savedUser;
+      if (formAuthGate) formAuthGate.classList.add('hidden');
+    } else {
+      if (userProfilePill) userProfilePill.classList.add('hidden');
+      if (userProfilePill) userProfilePill.classList.remove('flex');
+      if (emailField) emailField.value = '';
+      if (formAuthGate) formAuthGate.classList.remove('hidden');
+    }
+  }
+
+  // Open / Close Modal Handlers
+  if (authModalBtn) {
+    authModalBtn.addEventListener('click', () => {
+      const savedUser = localStorage.getItem('wc_user_email');
+      if (!savedUser && loginModal) {
+        loginModal.classList.remove('hidden');
+      }
+    });
+  }
+
+  if (triggerLoginModal) {
+    triggerLoginModal.addEventListener('click', () => {
+      if (loginModal) loginModal.classList.remove('hidden');
+    });
+  }
+
+  if (closeModalBtn) {
+    closeModalBtn.addEventListener('click', () => {
+      if (loginModal) loginModal.classList.add('hidden');
+    });
+  }
+
+  // Email Login Submit
+  if (emailLoginForm) {
+    emailLoginForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const emailVal = loginEmailInput.value.trim();
+      if (emailVal && emailVal.includes('@')) {
+        localStorage.setItem('wc_user_email', emailVal);
+        if (loginModal) loginModal.classList.add('hidden');
+        loginEmailInput.value = '';
+        checkAuthState();
+      }
+    });
+  }
+
+  // Simulated Google Login
+  if (googleLoginBtn) {
+    googleLoginBtn.addEventListener('click', () => {
+      const simulatedGoogleEmail = 'client.googleuser@gmail.com';
+      localStorage.setItem('wc_user_email', simulatedGoogleEmail);
+      if (loginModal) loginModal.classList.add('hidden');
+      checkAuthState();
+    });
+  }
+
+  // Logout Handler
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', () => {
+      localStorage.removeItem('wc_user_email');
+      checkAuthState();
+    });
+  }
+
+  // Initial check on page load
+  checkAuthState();
+
+  // --- Order form submission logic ---
   const orderForm = document.getElementById('orderForm');
   const formStatus = document.getElementById('formStatus');
   const submitBtn = document.getElementById('submitBtn');
@@ -71,13 +158,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
   orderForm.addEventListener('submit', async (ev) => {
     ev.preventDefault();
+    
+    // Ensure user is logged in
+    const currentUser = localStorage.getItem('wc_user_email');
+    if (!currentUser) {
+      if (loginModal) loginModal.classList.remove('hidden');
+      return;
+    }
+
     clearErrors();
     formStatus.textContent = '';
     submitBtn.disabled = true;
     submitBtn.classList.add('opacity-70');
 
     const name = orderForm.clientName.value.trim();
-    const email = orderForm.email.value.trim();
+    const email = currentUser; // Use authenticated user email
     const service = orderForm.service.value;
     const description = orderForm.description.value.trim();
     const budget = orderForm.budget.value.trim();
@@ -126,6 +221,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       formStatus.textContent = 'Order submitted successfully — thank you!';
       orderForm.reset();
+      checkAuthState(); // re-fill email
     } catch (err) {
       console.error(err);
       formStatus.innerHTML = 'Error sending order. Please try again later or email us directly.';
