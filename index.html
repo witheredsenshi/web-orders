@@ -290,7 +290,7 @@
           <!-- Auth Gate Overlay if not logged in -->
           <div id="formAuthGate" class="absolute inset-0 bg-gray-800/90 z-10 rounded-2xl flex flex-col items-center justify-center p-6 text-center backdrop-blur-sm hidden">
             <h3 class="text-xl font-bold mb-2">Sign In Required</h3>
-            <p class="text-sm text-gray-300 mb-4 max-w-sm">Please log in or sign up with your email to submit custom orders and track your projects.</p>
+            <p class="text-sm text-gray-300 mb-4 max-w-sm">Please log in or sign up with your email and password to submit custom orders and track your projects.</p>
             <button id="triggerLoginModal" class="px-5 py-2.5 bg-indigo-600 text-white rounded-md text-sm font-medium hover:opacity-95 shadow">
               Log In / Sign Up Now
             </button>
@@ -375,7 +375,7 @@
 
       <div class="text-center mb-6">
         <h3 class="text-xl font-bold">Welcome to WebCraft Studio</h3>
-        <p class="text-sm text-gray-400 mt-1">Sign in or create an account to start ordering.</p>
+        <p class="text-sm text-gray-400 mt-1">Sign in or create an account with your email & password.</p>
       </div>
 
       <!-- Simulated Google Login Button -->
@@ -386,15 +386,19 @@
 
       <div class="relative flex py-4 items-center">
         <div class="flex-grow border-t border-gray-700"></div>
-        <span class="flex-shrink mx-4 text-xs text-gray-400 uppercase">Or with email</span>
+        <span class="flex-shrink mx-4 text-xs text-gray-400 uppercase">Or with email & password</span>
         <div class="flex-grow border-t border-gray-700"></div>
       </div>
 
-      <!-- Email Login Form -->
+      <!-- Email & Password Login Form -->
       <form id="emailLoginForm" class="space-y-4">
         <div>
           <label for="loginEmailInput" class="block text-sm font-medium mb-1">Email Address</label>
           <input id="loginEmailInput" type="email" required placeholder="you@example.com" class="w-full rounded-md border border-gray-700 bg-transparent px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-800" />
+        </div>
+        <div>
+          <label for="loginPasswordInput" class="block text-sm font-medium mb-1">Password</label>
+          <input id="loginPasswordInput" type="password" required placeholder="••••••••" class="w-full rounded-md border border-gray-700 bg-transparent px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-800" />
         </div>
         <button type="submit" class="w-full py-2.5 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:opacity-95 shadow">
           Sign In / Register
