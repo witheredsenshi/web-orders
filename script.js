@@ -5,40 +5,6 @@ document.addEventListener('DOMContentLoaded', () => {
     yearEl.textContent = new Date().getFullYear();
   }
 
-  // Theme toggle logic
-  const htmlEl = document.documentElement;
-  const themeToggle = document.getElementById('themeToggle');
-  const toggleTrack = document.getElementById('toggleTrack');
-
-  function applyTheme(theme) {
-    if (!toggleTrack) return;
-    if (theme === 'dark') {
-      htmlEl.classList.add('dark');
-      toggleTrack.classList.add('toggle-checked');
-      toggleTrack.style.backgroundColor = '#374151';
-    } else {
-      htmlEl.classList.remove('dark');
-      toggleTrack.classList.remove('toggle-checked');
-      toggleTrack.style.backgroundColor = '#e5e7eb';
-    }
-  }
-
-  const storedTheme = localStorage.getItem('wc-theme');
-  if (storedTheme) {
-    applyTheme(storedTheme);
-  } else {
-    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-    applyTheme(prefersDark ? 'dark' : 'light');
-  }
-
-  if (themeToggle) {
-    themeToggle.addEventListener('click', () => {
-      const isNowDark = !htmlEl.classList.contains('dark');
-      applyTheme(isNowDark ? 'dark' : 'light');
-      localStorage.setItem('wc-theme', isNowDark ? 'dark' : 'light');
-    });
-  }
-
   // Set Minimum Deadline Date to 7 days from today
   const deadlineInput = document.getElementById('deadline');
   if (deadlineInput) {
@@ -175,7 +141,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const email = currentUser; // Use authenticated user email
     const service = orderForm.service.value;
     const description = orderForm.description.value.trim();
-    const budget = orderForm.budget.value.trim();
     const deadline = orderForm.deadline.value;
 
     const formspreeEndpoint = "https://formspree.io/f/xnpjrnpk";
@@ -207,7 +172,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     formStatus.textContent = 'Sending...';
     try {
-      const payload = { clientName: name, email, service, budget, deadline, description };
+      const payload = { clientName: name, email, service, deadline, description };
       const res = await fetch(formspreeEndpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
