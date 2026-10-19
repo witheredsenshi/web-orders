@@ -32,6 +32,45 @@ document.addEventListener('DOMContentLoaded', () => {
   const triggerLoginModal = document.getElementById('triggerLoginModal');
   const emailField = document.getElementById('email');
 
+  // Dashboard elements
+  const dashboardSection = document.getElementById('dashboardSection');
+  const noOrdersMessage = document.getElementById('noOrdersMessage');
+  const ordersListContainer = document.getElementById('ordersListContainer');
+
+  function renderUserOrders(userEmail) {
+    if (!dashboardSection) return;
+    dashboardSection.classList.remove('hidden');
+
+    const allOrders = JSON.parse(localStorage.getItem('wc_user_orders') || '{}');
+    const userOrders = allOrders[userEmail] || [];
+
+    if (userOrders.length === 0) {
+      if (noOrdersMessage) noOrdersMessage.classList.remove('hidden');
+      if (ordersListContainer) ordersListContainer.classList.add('hidden');
+    } else {
+      if (noOrdersMessage) noOrdersMessage.classList.add('hidden');
+      if (ordersListContainer) {
+        ordersListContainer.classList.remove('hidden');
+        ordersListContainer.innerHTML = userOrders.map((order, idx) => `
+          <div class="bg-gray-900/60 rounded-xl p-4 border border-gray-700 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-mono text-indigo-400">Order #${idx + 1}</span>
+                <span class="px-2 py-0.5 bg-yellow-900/40 text-yellow-400 text-xs rounded-md border border-yellow-800/40">Pending Review</span>
+              </div>
+              <h4 class="text-base font-semibold mt-1">${order.service}</h4>
+              <p class="text-xs text-gray-400 mt-0.5 line-clamp-1">${order.description}</p>
+            </div>
+            <div class="text-right text-xs text-gray-400 shrink-0">
+              <div>Submitted: <span class="text-gray-200 font-medium">${order.date}</span></div>
+              <div>Deadline: <span class="text-gray-200 font-medium">${order.deadline || 'Flexible'}</span></div>
+            </div>
+          </div>
+        `).join('');
+      }
+    }
+  }
+
   function checkAuthState() {
     const savedUser = localStorage.getItem('wc_user_email');
     if (savedUser) {
@@ -40,11 +79,13 @@ document.addEventListener('DOMContentLoaded', () => {
       if (userEmailDisplay) userEmailDisplay.textContent = savedUser;
       if (emailField) emailField.value = savedUser;
       if (formAuthGate) formAuthGate.classList.add('hidden');
+      renderUserOrders(savedUser);
     } else {
       if (userProfilePill) userProfilePill.classList.add('hidden');
       if (userProfilePill) userProfilePill.classList.remove('flex');
       if (emailField) emailField.value = '';
       if (formAuthGate) formAuthGate.classList.remove('hidden');
+      if (dashboardSection) dashboardSection.classList.add('hidden');
     }
   }
 
@@ -144,7 +185,7 @@ document.addEventListener('DOMContentLoaded', () => {
     submitBtn.classList.add('opacity-70');
 
     const name = orderForm.clientName.value.trim();
-    const email = currentUser; // Use authenticated user email
+    const email = currentUser;
     const service = orderForm.service.value;
     const description = orderForm.description.value.trim();
     const deadline = orderForm.deadline.value;
@@ -190,9 +231,22 @@ document.addEventListener('DOMContentLoaded', () => {
         throw new Error(`Submission failed (${res.status}): ${text}`);
       }
 
-      formStatus.textContent = 'Order submitted successfully — thank you!';
+      // Save order to local user history storage
+      const allOrders = JSON.parse(localStorage.getItem('wc_user_orders') || '{}');
+      if (!allOrders[email]) allOrders[email] = [];
+      
+      const newOrderRecord = {
+        service,
+        description,
+        deadline,
+        date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+      };
+      allOrders[email].unshift(newOrderRecord); // Add to beginning of array
+      localStorage.setItem('wc_user_orders', JSON.stringify(allOrders));
+
+      formStatus.textContent = 'Order submitted successfully & saved to your dashboard!';
       orderForm.reset();
-      checkAuthState(); // re-fill email
+      checkAuthState(); // re-fill email & refresh dashboard list
     } catch (err) {
       console.error(err);
       formStatus.innerHTML = 'Error sending order. Please try again later or email us directly.';
